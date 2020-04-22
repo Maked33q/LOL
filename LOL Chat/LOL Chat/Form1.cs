@@ -9,11 +9,19 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MaterialSkin;
 using MaterialSkin.Controls;
-
+using System.Data.SQLite;
+using System.IO;
 namespace LOL_Chat
 {
     public partial class FormMain : MaterialForm
     {
+        private string db = "Chat_db.db";
+        private string table1 = "Users";
+        private string table2 = "Groups";
+        private SQLiteDataAdapter adapt;
+        private DataTable dt;
+
+        SQLiteConnection conn;
         private static FormMain _instance;
 
         public static FormMain Instance
@@ -35,10 +43,51 @@ namespace LOL_Chat
         public FormMain()
         {
             InitializeComponent();
+            if (!File.Exists(db))
+            {
+                SQLiteConnection.CreateFile(db);
+            }
+            conn = new SQLiteConnection($"Data Source={db}; Version=3;");
+            conn.Open();
+            string query = $"CREATE TABLE IF NOT EXISTS {table1} (" +
+                "id INTEGER PRIMARY KEY NOT NULL, " +
+                "name TEXT, " +
+                "pass TEXT," +
+                "isActive INTEGER )";
+
+            SQLiteCommand cmd = new SQLiteCommand(query, conn);
+
+            if (cmd.ExecuteNonQuery() == 0)
+            {
+                string[] query1 =
+                {
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Jerry', 'qwery',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Pedro', '1234',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Tony', 'qwerty',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Bill', '111',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('FFFF', '222',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Ron', '1q2w',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Cot', 'qwe',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Rot', 'eqw',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Mot', 'abc',0)"
+            };
+                for (int i = 0; i < query1.Length; i++)
+                {
+                    cmd.CommandText = query1[i];
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            conn.Close();
             MaterialSkinManager manager = MaterialSkinManager.Instance;
             manager.AddFormToManage(this);
             manager.Theme = MaterialSkinManager.Themes.DARK;
             manager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey700, Primary.Grey800, Accent.LightBlue200, TextShade.WHITE);
+        }
+
+        private void users_b_Click(object sender, EventArgs e)
+        {
+            Users users = new Users();
+            users.Show();
         }
     }
 }
