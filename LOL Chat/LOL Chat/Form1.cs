@@ -78,10 +78,13 @@ namespace LOL_Chat
                 }
             }
             conn.Close();
+
+            ///////////////////////////////////////////////////////////////////////
             MaterialSkinManager manager = MaterialSkinManager.Instance;
             manager.AddFormToManage(this);
             manager.Theme = MaterialSkinManager.Themes.DARK;
             manager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey700, Primary.Grey800, Accent.LightBlue200, TextShade.WHITE);
+            ///////////////////////////////////////////////////////////////////////
         }
 
         private void users_b_Click(object sender, EventArgs e)
