@@ -11,20 +11,32 @@ using System.Data.SQLite;
 using System.IO;
 using MaterialSkin;
 using MaterialSkin.Controls;
+using System.Net;
 namespace LOL_Chat
 {
     public partial class Users : MaterialForm
     {
+        //Base variable
         private string db = "Chat_db.db";
         private string table1 = "Users";
         private string table2 = "Groups";
         private SQLiteDataAdapter adapt;
         private DataTable dt;
-
         SQLiteConnection conn;
+        //
+        //Geting IP
+        private string myIP = Dns.GetHostByName(Dns.GetHostName()).AddressList[0].ToString();
+        //
+        private static string removedIP;
+
+
         public Users()
         {
             InitializeComponent();
+            ////////////////////////////
+            textBox1.Text = myIP;
+            removedIP = textBox2.Text;
+            ///////////////////////////
             try
             {
                 conn = new SQLiteConnection($"Data Source={db};Version=3;");
@@ -41,6 +53,13 @@ namespace LOL_Chat
             {
                 MessageBox.Show(ec.Message);
             }
+
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(textBox1.Text);
         }
     }
 }
