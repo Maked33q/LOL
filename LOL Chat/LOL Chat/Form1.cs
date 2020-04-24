@@ -11,6 +11,10 @@ using MaterialSkin;
 using MaterialSkin.Controls;
 using System.Data.SQLite;
 using System.IO;
+using System.Net.Sockets;
+using System.Net;
+using LOL_Chat.Classes;
+
 namespace LOL_Chat
 {
     public partial class FormMain : MaterialForm
@@ -21,10 +25,23 @@ namespace LOL_Chat
         private string table3 = "KeyInfo";
         private SQLiteDataAdapter adapt;
         private DataTable dt;
-
         SQLiteConnection conn;
-        private static FormMain _instance;
+        FileSender fileSender = new FileSender();
 
+
+        bool alive = false;
+        UdpClient client;
+        const int LOCALPORT = 8001;
+        const int REMOTEPORT = 8001;
+        const int TTL = 20;
+        const string HOST = "235.5.5.1";
+        IPAddress groupAddress;
+        IPAddress remoteAddress;
+
+
+        string userName;
+
+        private static FormMain _instance;
         public static FormMain Instance
         {
             get
@@ -40,10 +57,12 @@ namespace LOL_Chat
                 }
             }
         }
-        
+
         public FormMain()
         {
             InitializeComponent();
+            groupAddress = IPAddress.Parse(HOST);
+            #region 
             if (!File.Exists(db))
             {
                 SQLiteConnection.CreateFile(db);
@@ -95,13 +114,84 @@ namespace LOL_Chat
             cmd = new SQLiteCommand(query, conn);
             cmd.ExecuteNonQuery();
             conn.Close();
-
-            ///////////////////////////////////////////////////////////////////////
+            #endregion 
+            #region
             MaterialSkinManager manager = MaterialSkinManager.Instance;
             manager.AddFormToManage(this);
             manager.Theme = MaterialSkinManager.Themes.DARK;
             manager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey700, Primary.Grey800, Accent.LightBlue200, TextShade.WHITE);
-            ///////////////////////////////////////////////////////////////////////
+            #endregion
+
+            userName = "default";
+            try
+            {
+                client = new UdpClient(LOCALPORT);
+                client.JoinMulticastGroup(groupAddress, TTL);
+                Task receiveTask = new Task(ReceiveMessages);
+                receiveTask.Start();
+                string message = userName + " вошел в чат";
+                byte[] data = Encoding.Unicode.GetBytes(message);
+                client.Send(data, data.Length, HOST, REMOTEPORT);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void ReceiveMessages()
+        {
+            alive = true;
+            try
+            {
+                while (alive)
+                {
+                    IPEndPoint remoteIp = null;
+                    byte[] data = client.Receive(ref remoteIp);
+                    string message = Encoding.Unicode.GetString(data);
+                    if (String.IsNullOrEmpty(message))
+                        return;
+                    else
+                        textBox1.Text = message + "\r\n" + textBox1.Text;
+
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                if (!alive)
+                    return;
+                throw;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void sendButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string message = String.Format("{0}: {1}", userName, textBox2.Text);
+                byte[] data = Encoding.Unicode.GetBytes(message);
+                client.Send(data, data.Length, HOST, REMOTEPORT);
+                textBox2.Clear();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void logoutButton_Click(object sender, EventArgs e)
+        {
+            ExitChat();
+        }
+        private void ExitChat()
+        {
+            string message = userName + " покидает чат";
+            byte[] data = Encoding.Unicode.GetBytes(message);
+            client.Send(data, data.Length, HOST, REMOTEPORT);
+            client.DropMulticastGroup(groupAddress);
+            alive = false;
+            client.Close();
         }
 
         private void users_b_Click(object sender, EventArgs e)
@@ -109,5 +199,42 @@ namespace LOL_Chat
             Users users = new Users();
             users.Show();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "txt files (*.txt;*.docx)|*.txt;*.docx|All files (*.*)|*.*";
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    textBox1.Text = openFileDialog1.FileName;
+                    Clipboard.SetText(textBox1.Text);
+                    FileSender.Sender(Clipboard.GetText());
+                    textBox1.Text = FileSender.SendFileInfo();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+
+        }
+
+        private void FormMain_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+
     }
 }
