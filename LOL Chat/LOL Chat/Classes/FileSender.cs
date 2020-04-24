@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml.Serialization;
 
 namespace LOL_Chat.Classes
@@ -13,9 +14,9 @@ namespace LOL_Chat.Classes
     public class FileSender
     {
         private static FileDetails fileDet = new FileDetails();
-
-        private static IPAddress remonteIPAddress;
-        private const int remontePort = 5002;
+        const string HOST = "235.5.5.1";
+        private static IPAddress remonteIPAddress = IPAddress.Parse(HOST);
+        private const int remontePort = 8001;
         private static UdpClient sender = new UdpClient();
         private static IPEndPoint endPoint;
 
@@ -28,20 +29,19 @@ namespace LOL_Chat.Classes
             public long FILESIZE = 0;
         }
         [STAThread]
-        static void Sender()
+        public static void Sender(string filePath)
         {
             try
             {
-                Console.WriteLine("Enter Remonte IP address");
-                remonteIPAddress = IPAddress.Parse(Console.ReadLine().ToString());
                 endPoint = new IPEndPoint(remonteIPAddress, remontePort);
                 Console.WriteLine("Enter File path and name to send");
-                fs = new FileStream(@Console.ReadLine().ToString(), FileMode.Open, FileAccess.Read);
+                fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                 if (fs.Length > 8192)
                 {
-                    Console.Write("This version transfer files with size < 8192 bytes");
+                    MessageBox.Show("File is too big!");
                     sender.Close();
                     fs.Close();
+                    SendFile();
                     return;
                 }
             }
@@ -50,7 +50,7 @@ namespace LOL_Chat.Classes
                 Console.WriteLine(e.ToString());
             }
         }
-        public static void SendFileInfo()
+        public static string SendFileInfo()
         {
             fileDet.FILETYPE = fs.Name.Substring((int)fs.Name.Length - 3, 3);
             fileDet.FILESIZE = fs.Length;
@@ -60,31 +60,31 @@ namespace LOL_Chat.Classes
             stream.Position = 0;
             byte[] bytes = new byte[stream.Length];
             stream.Read(bytes, 0, Convert.ToInt32(stream.Length));
-
-            Console.WriteLine("Sending file details...");
+            string str; 
             sender.Send(bytes, bytes.Length, endPoint);
             stream.Close();
+            return str = "Sending file details...";
         }
-        private static void SendFile()
+        private static string SendFile()
         {
             byte[] bytes = new byte[fs.Length];
             fs.Read(bytes, 0, bytes.Length);
-            Console.WriteLine("Sending file...size=" + fs.Length + "bytes");
+            //Console.WriteLine("Sending file...size=" + fs.Length + "bytes");
             try
             {
                 sender.Send(bytes, bytes.Length, endPoint);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+               MessageBox.Show(e.ToString());
             }
             finally
             {
                 fs.Close();
                 sender.Close();
             }
-            Console.Read();
-            Console.WriteLine("File sent successfully");
+            string str;
+            return str = "File sent successfully";
         }
     }
 }

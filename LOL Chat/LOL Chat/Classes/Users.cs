@@ -61,5 +61,15 @@ namespace LOL_Chat
         {
             Clipboard.SetText(textBox1.Text);
         }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

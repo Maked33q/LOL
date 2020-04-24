@@ -13,6 +13,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Net.Sockets;
 using System.Net;
+using LOL_Chat.Classes;
 
 namespace LOL_Chat
 {
@@ -25,6 +26,7 @@ namespace LOL_Chat
         private SQLiteDataAdapter adapt;
         private DataTable dt;
         SQLiteConnection conn;
+        FileSender fileSender = new FileSender();
 
 
         bool alive = false;
@@ -59,6 +61,7 @@ namespace LOL_Chat
         public FormMain()
         {
             InitializeComponent();
+            groupAddress = IPAddress.Parse(HOST);
             #region 
             if (!File.Exists(db))
             {
@@ -119,26 +122,21 @@ namespace LOL_Chat
             manager.ColorScheme = new ColorScheme(Primary.BlueGrey800, Primary.BlueGrey700, Primary.Grey800, Accent.LightBlue200, TextShade.WHITE);
             #endregion
 
-
-            //try
-            //{
-            //    client = new UdpClient(LOCALPORT);
-            //    // присоединяемся к групповой рассылке
-            //    client.JoinMulticastGroup(groupAddress, TTL);
-
-            //    // запускаем задачу на прием сообщений
-            //    Task receiveTask = new Task(ReceiveMessages);
-            //    receiveTask.Start();
-
-            //    // отправляем первое сообщение о входе нового пользователя
-            //    string message = userName + " вошел в чат";
-            //    byte[] data = Encoding.Unicode.GetBytes(message);
-            //    client.Send(data, data.Length, HOST, REMOTEPORT);
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //}
+            userName = "default";
+            try
+            {
+                client = new UdpClient(LOCALPORT);
+                client.JoinMulticastGroup(groupAddress, TTL);
+                Task receiveTask = new Task(ReceiveMessages);
+                receiveTask.Start();
+                string message = userName + " вошел в чат";
+                byte[] data = Encoding.Unicode.GetBytes(message);
+                client.Send(data, data.Length, HOST, REMOTEPORT);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
         private void ReceiveMessages()
         {
@@ -150,13 +148,11 @@ namespace LOL_Chat
                     IPEndPoint remoteIp = null;
                     byte[] data = client.Receive(ref remoteIp);
                     string message = Encoding.Unicode.GetString(data);
+                    if (String.IsNullOrEmpty(message))
+                        return;
+                    else
+                        textBox1.Text = message + "\r\n" + textBox1.Text;
 
-                    // добавляем полученное сообщение в текстовое поле
-                    this.Invoke(new MethodInvoker(() =>
-                    {
-                        string time = DateTime.Now.ToShortTimeString();
-                        textBox1.Text = time + " " + message + "\r\n" + textBox1.Text;
-                    }));
                 }
             }
             catch (ObjectDisposedException)
@@ -184,7 +180,6 @@ namespace LOL_Chat
                 MessageBox.Show(ex.Message);
             }
         }
-        // обработчик нажатия кнопки logoutButton
         private void logoutButton_Click(object sender, EventArgs e)
         {
             ExitChat();
@@ -210,10 +205,19 @@ namespace LOL_Chat
             openFileDialog1.Filter = "txt files (*.txt;*.docx)|*.txt;*.docx|All files (*.*)|*.*";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                textBox1.Text = openFileDialog1.FileName;
-                Stream stream = openFileDialog1.OpenFile();
-
+                try
+                {
+                    textBox1.Text = openFileDialog1.FileName;
+                    Clipboard.SetText(textBox1.Text);
+                    FileSender.Sender(Clipboard.GetText());
+                    textBox1.Text = FileSender.SendFileInfo();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             }
+
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -230,5 +234,7 @@ namespace LOL_Chat
         {
 
         }
+
+
     }
 }

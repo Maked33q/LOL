@@ -43,7 +43,7 @@
             // 
             this.users_b.Location = new System.Drawing.Point(641, 67);
             this.users_b.Name = "users_b";
-            this.users_b.Size = new System.Drawing.Size(147, 182);
+            this.users_b.Size = new System.Drawing.Size(147, 371);
             this.users_b.TabIndex = 0;
             this.users_b.Text = "Users";
             this.users_b.UseVisualStyleBackColor = true;
@@ -69,13 +69,13 @@
             this.textBox1.Location = new System.Drawing.Point(149, 67);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(486, 107);
+            this.textBox1.Size = new System.Drawing.Size(486, 296);
             this.textBox1.TabIndex = 3;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(223, 180);
+            this.textBox2.Location = new System.Drawing.Point(223, 369);
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(331, 69);
@@ -86,11 +86,12 @@
             // 
             this.button1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.button1.Image = global::LOL_Chat.Properties.Resources.icons8_add_100;
-            this.button1.Location = new System.Drawing.Point(149, 180);
+            this.button1.Location = new System.Drawing.Point(149, 369);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(68, 69);
             this.button1.TabIndex = 5;
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // openFileDialog1
             // 
@@ -98,12 +99,13 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(560, 181);
+            this.button2.Location = new System.Drawing.Point(560, 370);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 68);
             this.button2.TabIndex = 6;
             this.button2.Text = "Send";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.sendButton_Click);
             // 
             // FormMain
             // 
