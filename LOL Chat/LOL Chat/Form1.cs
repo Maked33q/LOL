@@ -20,7 +20,8 @@ namespace LOL_Chat
     {
         private string db = "Chat_db.db";
         private string table1 = "Users";
-        private string table2 = "Groups";
+        private string table2 = "Message";
+        private string table3 = "KeyInfo";
         private SQLiteDataAdapter adapt;
         private DataTable dt;
         SQLiteConnection conn;
@@ -93,6 +94,22 @@ namespace LOL_Chat
                     cmd.ExecuteNonQuery();
                 }
             }
+
+            query = $"CREATE TABLE IF NOT EXISTS {table2} (" +
+                "public_key INTEGER, " +
+                "key_blob INTEGER, " +
+                "message TEXT," +
+                "message_type TEXT )";
+            cmd = new SQLiteCommand(query, conn);
+            cmd.ExecuteNonQuery();
+
+
+            query = $"CREATE TABLE IF NOT EXISTS {table3} (" +
+                "key_id INTEGER PRIMARY KEY NOT NULL, " +
+                "public_key INTEGER, " +
+                "key_blob INTEGER)";
+            cmd = new SQLiteCommand(query, conn);
+            cmd.ExecuteNonQuery();
             conn.Close();
             #endregion 
             #region
