@@ -53,7 +53,7 @@ namespace LOL_Chat
             string query = $"CREATE TABLE IF NOT EXISTS {table1} (" +
                 "id INTEGER PRIMARY KEY NOT NULL, " +
                 "name TEXT, " +
-                "pass TEXT," +
+                "ip TEXT," +
                 "isActive INTEGER )";
 
             SQLiteCommand cmd = new SQLiteCommand(query, conn);
@@ -62,15 +62,15 @@ namespace LOL_Chat
             {
                 string[] query1 =
                 {
-            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Jerry', 'qwery',0)",
-            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Pedro', '1234',0)",
-            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Tony', 'qwerty',0)",
-            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Bill', '111',0)",
-            $"INSERT INTO {table1} (name,pass,isActive) VALUES('FFFF', '222',0)",
-            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Ron', '1q2w',0)",
-            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Cot', 'qwe',0)",
-            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Rot', 'eqw',0)",
-            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Mot', 'abc',0)"
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Jerry', '1.1.1.1',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Pedro', '1.1.1.1',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Tony', '1.1.1.1',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Bill', '1.1.1.1',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('FFFF', '1.1.1.1',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Ron', '1.1.1.1',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Cot', '1.1.1.1',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Rot', '1.1.1.1',0)",
+            $"INSERT INTO {table1} (name,pass,isActive) VALUES('Mot', '1.1.1.1',0)"
             };
                 for (int i = 0; i < query1.Length; i++)
                 {
